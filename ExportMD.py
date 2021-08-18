@@ -6,7 +6,6 @@
 # description: 自动导出语雀知识库为Markdown格式
 # -----------------------------------------
 
-from asyncio.runners import run
 from prettytable import PrettyTable
 import os
 import aiohttp
