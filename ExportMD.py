@@ -138,7 +138,7 @@ class ExportMD:
     async def to_local_image_src(self, body):
         pattern = r"!\[(?P<img_name>.*?)\]" \
                   r"\((?P<img_src>https:\/\/cdn\.nlark\.com\/yuque.*\/(?P<slug>\d+)\/(?P<filename>.*?\.[a-zA-z]+)).*\)"
-        repl = r"![\g<img_name>](./\g<slug>/\g<filename>)"
+        repl = r"![\g<img_name>](./assets/\g<filename>)"
         images = [_.groupdict() for _ in re.finditer(pattern, body)]
         new_body = re.sub(pattern, repl, body)
         return new_body, images
