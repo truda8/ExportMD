@@ -7,9 +7,11 @@
 # -----------------------------------------
 
 from prettytable import PrettyTable
+import re
 import os
 import aiohttp
 import asyncio
+from urllib import parse
 from PyInquirer import prompt, Separator
 from examples import custom_style_2
 from colr import color
@@ -49,6 +51,7 @@ class ExportMD:
     # 发送请求
     async def req(self, session, api):
         url = "https://www.yuque.com/api/v2" + api
+        # print(url)
         async with session.get(url, headers=self.headers) as resp:
             result = await resp.json()
             return result
@@ -83,9 +86,6 @@ class ExportMD:
             result = await self.req(session, api)
             body = result['data']['body']
             return body
-            # 去除第一行
-            # body = body.split("\n")[1:]
-            # return "\n".join(body)  
 
     # 选择知识库
     def selectRepo(self):
@@ -109,10 +109,59 @@ class ExportMD:
         if not isExists:
             os.makedirs(dir)
 
+    # 获取文章并执行保存
+    async def download_md(self, repo_id, slug, repo_name, title):
+        """
+        :param repo_id: 知识库id
+        :param slug: 文章id
+        :param repo_name: 知识库名称
+        :param title: 文章名称
+        :return: none
+        """
+        body = await self.get_body(repo_id, slug)
+        new_body, image_list = await self.to_local_image_src(body)
+
+        if image_list:
+            # 图片保存位置: .yuque/<repo_name>/assets/<filename>
+            save_dir = os.path.join(self.export_dir, repo_name, "assets")
+            self.mkDir(save_dir)
+            async with aiohttp.ClientSession() as session:
+                await asyncio.gather(
+                    *(self.download_image(session, image_info, save_dir) for image_info in image_list)
+                )
+
+        self.save(repo_name, title, new_body)
+
+        print("📑 %s 导出成功！" % color(title, fore='green', style='bright'))
+
+    # 将md里的图片地址替换成本地的图片地址
+    async def to_local_image_src(self, body):
+        pattern = r"!\[(?P<img_name>.*?)\]" \
+                  r"\((?P<img_src>https:\/\/cdn\.nlark\.com\/yuque.*\/(?P<slug>\d+)\/(?P<filename>.*?\.[a-zA-z]+)).*\)"
+        repl = r"![\g<img_name>](./\g<slug>/\g<filename>)"
+        images = [_.groupdict() for _ in re.finditer(pattern, body)]
+        new_body = re.sub(pattern, repl, body)
+        return new_body, images
+
+    # 下载图片
+    async def download_image(self, session, image_info: dict, save_dir: str):
+        img_src = image_info['img_src']
+        filename = image_info["filename"]
+
+        async with session.get(img_src) as resp:
+            with open(os.path.join(save_dir, filename), 'wb') as f:
+                f.write(await resp.read())
+
     # 保存文章
     def save(self, repo_name, title, body):
-        repo_name = repo_name.replace("/", "%2F")
-        title = title.replace("/", "%2F")
+        # 将不能作为文件名的字符进行编码
+        def check_safe_path(path: str):
+            for char in r'/\<>?:"|*':
+                path = path.replace(char, parse.quote_plus(char))
+            return path
+
+        repo_name = check_safe_path(repo_name)
+        title = check_safe_path(title)
         save_path = "./yuque/%s/%s.md" % (repo_name, title)
         with open(save_path, "w", encoding="utf-8") as f:
             f.write(body)
@@ -133,11 +182,10 @@ class ExportMD:
             repo_id = self.repo[repo_name]
             docs = await self.get_docs(repo_id)
 
-            # 获取知识库所有文章内容
-            for slug, title in docs.items():
-                body = await self.get_body(repo_id, slug)
-                self.save(repo_name, title, body)
-                print("📑 %s 导出成功！" % color(title, fore='green', style='bright'))
+            await asyncio.gather(
+                *(self.download_md(repo_id, slug, repo_name, title) for slug, title in docs.items())
+            )
+
         print("\n" + color('🎉 导出完成！', fore='green', style='bright'))
         print("已导出到：" + color(os.path.realpath(self.export_dir), fore='green', style='bright'))
 
