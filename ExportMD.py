@@ -85,6 +85,9 @@ class ExportMD:
         async with aiohttp.ClientSession() as session:
             result = await self.req(session, api)
             body = result['data']['body']
+            body = re.sub("<a name=\".*\"></a>","", body)  # 正则去除语雀导出的<a>标签
+            body = re.sub(r'\<br \/\>!\[image.png\]',"\n![image.png]",body) # 正则去除语雀图像前的<br \>标签,并换行
+            body = re.sub(r'\)\<br \/\>', ")\n", body) # 正则去除语雀图像后的<br \>标签,并换行
             return body
 
     # 选择知识库
@@ -136,6 +139,9 @@ class ExportMD:
 
     # 将md里的图片地址替换成本地的图片地址
     async def to_local_image_src(self, body):
+        body = re.sub(r'\<br \/\>!\[image.png\]',"\n![image.png]",body) # 正则去除语雀图像前的<br \>标签,并换行
+        body = re.sub(r'\)\<br \/\>', ")\n", body) # 正则去除语雀图像后的<br \>标签,并换行
+        
         pattern = r"!\[(?P<img_name>.*?)\]" \
                   r"\((?P<img_src>https:\/\/cdn\.nlark\.com\/yuque.*\/(?P<slug>\d+)\/(?P<filename>.*?\.[a-zA-z]+)).*\)"
         repl = r"![\g<img_name>](./assets/\g<filename>)"
