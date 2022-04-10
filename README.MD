@@ -28,6 +28,9 @@ https://github.com/stone0090/ExportMD-rectify-pics/blob/bf2b79ef0afaffcad78253ca
 修改为同步导出，且每次导出等待100ms
 本人技术水平有限，感谢[@stone0090](https://github.com/stone0090/ExportMD-rectify-pics)!的修复
 
+---
+
+
 ## 安装
 ### 环境要求
  - python >= 3.6
@@ -36,12 +39,9 @@ https://github.com/stone0090/ExportMD-rectify-pics/blob/bf2b79ef0afaffcad78253ca
 ```bash
 pip install -r requirements.txt
 ```
+---
 
-## 使用
-### 使用 python3 运行
-```bash
-python ExportMD.py
-```
+# 使用
 
 ## 获取 namespace
 知识库 namespace：知识库 URL 中路径部分
@@ -50,3 +50,11 @@ python ExportMD.py
 
 ## 获取 token
 ![token](https://s3.jpg.cm/2021/08/17/IUIASp.png)
+## 使用 python3 运行
+```bash
+python ExportMD.py
+```
+## 输入namespace和token
+`⬆ ⬇`移动，`space`选择，`a`全选，`Enter`确认
+![image](https://user-images.githubusercontent.com/61380549/162611337-9b2f875f-6cf0-47d6-87ba-6aa6a7f5efef.png)
+
