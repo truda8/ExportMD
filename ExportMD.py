@@ -9,6 +9,7 @@
 from prettytable import PrettyTable
 import re
 import os
+import time
 import aiohttp
 import asyncio
 from urllib import parse
