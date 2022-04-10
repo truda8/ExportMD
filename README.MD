@@ -1,4 +1,5 @@
 # ExportMD-rectify-pics
+## 1、写在前面
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue) ![License](https://img.shields.io/badge/license-MIT-yellow) ![python](https://img.shields.io/badge/python->=3.6-orange)
 
 简介：ExportMD语雀知识库自动导出为 Markdown 格式，支持同时导出多个知识库。
@@ -11,7 +12,7 @@
 另外我想说明一下，复刻这个仓库的目的是为了防止重要的笔记丢失，让大家能够有一个本地的markdown笔记备份，但我并不希望语雀因此流失用户，语雀真的是一款非常优秀的笔记软件，我会一直支持下去的！
 
 
-## 版本v1.0
+### 版本v1.0
 API导出连着的图片时，会出现很多`<br />`，这时连续图片中只有第一张图片会被识别
 ```
 ![image.png](https://cdn.nlark.com/xxx1.png)<br />![image.png](https://cdn.nlark.com/xxx2.png)<br />![image.png](https://cdn.nlark.com/xxx3.png)
@@ -19,7 +20,7 @@ API导出连着的图片时，会出现很多`<br />`，这时连续图片中只
 ```
 为了解决这一问题，在原来的ExportMD基础上，我增加了正则表达式，现在连续图片的导出已经没有问题
 这里特别感谢ExportMD！
-## 版本v1.1
+### 版本v1.1
 实际使用的时候有遇到一些小问题，主要是接口限制等会导致有时候请求失败
 这里使用[@stone0090](https://github.com/stone0090/ExportMD-rectify-pics)的解决方案  
 
@@ -28,10 +29,8 @@ https://github.com/stone0090/ExportMD-rectify-pics/blob/bf2b79ef0afaffcad78253ca
 修改为同步导出，且每次导出等待100ms
 本人技术水平有限，感谢[@stone0090](https://github.com/stone0090/ExportMD-rectify-pics)!的修复
 
----
 
-
-## 安装
+## 2、安装
 ### 环境要求
  - python >= 3.6
 
@@ -41,7 +40,7 @@ pip install -r requirements.txt
 ```
 ---
 
-# 使用
+## 3、使用
 
 ## 获取 namespace
 知识库 namespace：知识库 URL 中路径部分
