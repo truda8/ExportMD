@@ -187,10 +187,16 @@ class ExportMD:
 
             repo_id = self.repo[repo_name]
             docs = await self.get_docs(repo_id)
+            
+            # 异步导出接口会报错，修改为同步导出，且每次导出等待50ms
+            for slug in docs:
+                time.sleep(0.05)
+                title = docs[slug]
+                await self.download_md(repo_id, slug, repo_name, title)
 
-            await asyncio.gather(
-                *(self.download_md(repo_id, slug, repo_name, title) for slug, title in docs.items())
-            )
+#             await asyncio.gather(
+#                 *(self.download_md(repo_id, slug, repo_name, title) for slug, title in docs.items())
+#             )
 
         print("\n" + color('🎉 导出完成！', fore='green', style='bright'))
         print("已导出到：" + color(os.path.realpath(self.export_dir), fore='green', style='bright'))
