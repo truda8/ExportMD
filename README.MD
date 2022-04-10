@@ -13,9 +13,12 @@ API导出连着的图片时，会出现很多`<br />`，这时连续图片中只
 这里特别感谢ExportMD！
 ## 版本v1.1
 实际使用的时候有遇到一些小问题，主要是接口限制等会导致有时候请求失败
-这里使用@stone0090的解决方案，https://github.com/stone0090/ExportMD-rectify-pics/blob/bf2b79ef0afaffcad78253cafa1760f45359623e/ExportMD.py#L198
+这里使用@stone0090 的解决方案，
+https://github.com/stone0090/ExportMD-rectify-pics/blob/bf2b79ef0afaffcad78253cafa1760f45359623e/ExportMD.py#L198 
+
 修改为同步导出，且每次导出等待100ms
-本人技术水平，感谢`stone0090`!的修复
+本人技术水平有限，感谢`stone0090`!的修复
+
 ## 安装
 ### 环境要求
  - python >= 3.6
