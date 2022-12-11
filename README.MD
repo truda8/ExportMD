@@ -32,7 +32,7 @@ https://github.com/stone0090/ExportMD-rectify-pics/blob/bf2b79ef0afaffcad78253ca
 
 ## 2、安装
 ### 环境要求
- - python >= 3.6
+ - python >= 3.6 && python <= 3.9
 
 ### 安装 python 依赖
 ```bash
