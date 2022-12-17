@@ -9,6 +9,7 @@
 from prettytable import PrettyTable
 import re
 import os
+import time
 import aiohttp
 import asyncio
 from urllib import parse
@@ -85,6 +86,11 @@ class ExportMD:
         async with aiohttp.ClientSession() as session:
             result = await self.req(session, api)
             body = result['data']['body']
+            body = re.sub("<a name=\".*\"></a>","", body)  # 正则去除语雀导出的<a>标签
+            body = re.sub("\x00", "", body) # 去除不可见字符\x00
+            body = re.sub("\x05", "", body) # 去除不可见字符\x05
+            body = re.sub(r'\<br \/\>!\[image.png\]',"\n![image.png]",body) # 正则去除语雀导出的图片后紧跟的<br \>标签
+            body = re.sub(r'\)\<br \/\>', ")\n", body)  # 正则去除语雀导出的图片后紧跟的<br \>标签
             return body
 
     # 选择知识库
@@ -136,6 +142,9 @@ class ExportMD:
 
     # 将md里的图片地址替换成本地的图片地址
     async def to_local_image_src(self, body):
+        body = re.sub(r'\<br \/\>!\[image.png\]',"\n![image.png]",body) # 正则去除语雀导出的图片后紧跟的<br \>标签
+        body = re.sub(r'\)\<br \/\>', ")\n", body)  # 正则去除语雀导出的图片后紧跟的<br \>标签
+        
         pattern = r"!\[(?P<img_name>.*?)\]" \
                   r"\((?P<img_src>https:\/\/cdn\.nlark\.com\/yuque.*\/(?P<slug>\d+)\/(?P<filename>.*?\.[a-zA-z]+)).*\)"
         repl = r"![\g<img_name>](./assets/\g<filename>)"
@@ -181,10 +190,16 @@ class ExportMD:
 
             repo_id = self.repo[repo_name]
             docs = await self.get_docs(repo_id)
+            
+            # 异步导出接口会报错，修改为同步导出，且每次导出等待50ms
+            for slug in docs:
+                time.sleep(0.05)
+                title = docs[slug]
+                await self.download_md(repo_id, slug, repo_name, title)
 
-            await asyncio.gather(
-                *(self.download_md(repo_id, slug, repo_name, title) for slug, title in docs.items())
-            )
+#             await asyncio.gather(
+#                 *(self.download_md(repo_id, slug, repo_name, title) for slug, title in docs.items())
+#             )
 
         print("\n" + color('🎉 导出完成！', fore='green', style='bright'))
         print("已导出到：" + color(os.path.realpath(self.export_dir), fore='green', style='bright'))
